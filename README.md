@@ -8,7 +8,7 @@ This serves as a minimal working example of micro-ROS on the Pico W — useful a
 
 ## Hardware
 
-- Raspberry Pi Pico W (or Pico 2W)
+- Raspberry Pi Pico W or Pico 2W
 - Host machine running ROS 2 Jazzy on the same WiFi network
 
 ---
@@ -43,16 +43,43 @@ source ~/.bashrc
 
 ## Configuration
 
-Before building, edit the following in `pico_micro_ros_example.c`:
+**Board selection:** This repo defaults to the Pico 2W. If you're using the original Pico W, change line 2 of `CMakeLists.txt`:
+
+```cmake
+set(PICO_BOARD pico_w)    # original Pico W
+# set(PICO_BOARD pico2_w) # Pico 2W
+```
+
+**WiFi credentials:** Edit `pico_micro_ros_example.c`:
 
 ```c
 char ssid[] = "SSID";      // your WiFi network name
 char pass[] = "PASSWORD";  // your WiFi password
 ```
 
-And set your host machine's IP address in `picow_udp_transports.h`.
+**Agent IP address:** Set your host machine's IP in `picow_udp_transports.h`.
 
-If using a **Pico 2W**, update line 2 of `CMakeLists.txt` accordingly.
+---
+
+## Build the libmicroros Static Library
+
+`libmicroros` is a precompiled static library required to build this project. It is not included in the repo and must be generated once using Docker.
+
+Clone the micro-ROS Pico SDK and run the builder:
+
+```bash
+cd ~/micro_ros_ws/src
+git clone https://github.com/micro-ROS/micro_ros_raspberrypi_pico_sdk.git
+cd micro_ros_raspberrypi_pico_sdk
+docker run --rm -v $(pwd):/project --env PICO_SDK_PATH=/project/pico-sdk microros/micro_ros_static_library_builder:jazzy
+```
+
+Then copy the output into this project:
+
+```bash
+cp -r ~/micro_ros_ws/src/micro_ros_raspberrypi_pico_sdk/libmicroros \
+      ~/micro_ros_ws/src/pico-microros/libmicroros
+```
 
 ---
 
